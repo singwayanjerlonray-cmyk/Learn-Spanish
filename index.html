@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#4ADE80">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SpanishSpark">
+  <title>SpanishSpark 🇪🇸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CSS VARIABLES & RESET
+    ============================================================ */
+    :root {
+      --primary:      #4ADE80;
+      --primary-dark: #22C55E;
+      --accent:       #FBBF24;
+      --pop:          #F472B6;
+      --blue:         #60A5FA;
+      --purple:       #A78BFA;
+      --bg:           #F0FDF4;
+      --card:         #FFFFFF;
+      --text:         #1E293B;
+      --text-light:   #64748B;
+      --danger:       #F87171;
+      --radius-card:  20px;
+      --radius-btn:   999px;
+      --shadow:       0 4px 20px rgba(0,0,0,0.08);
+      --shadow-sm:    0 2px 12px rgba(0,0,0,0.06);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family:'Nunito',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    .app { max-width:420px; margin:0 auto; min-height:100vh; padding-bottom:90px; position:relative; }
+    .screen { display:none; padding:16px 16px 0; animation:fadeIn 0.25s ease; }
+    .screen.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ============================================================
+       TOP BAR
+    ============================================================ */
+    .top-bar {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:14px 16px 0; position:sticky; top:0;
+      background:var(--bg); z-index:10;
+    }
+    .app-logo { font-family:'Baloo 2',cursive; font-size:1.4rem; font-weight:800; color:var(--primary-dark); }
+    .streak-badge {
+      background:linear-gradient(135deg,#FF9A00,#FF6B6B); color:white;
+      border-radius:var(--radius-btn); padding:6px 14px;
+      font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:4px;
+      box-shadow:0 2px 8px rgba(255,107,107,0.3);
+    }
+    .pro-badge {
+      background:linear-gradient(135deg,var(--accent),#F59E0B); color:white;
+      border-radius:var(--radius-btn); padding:3px 10px;
+      font-size:0.7rem; font-weight:700; margin-left:6px;
+    }
+
+    /* ============================================================
+       BLOBS
+    ============================================================ */
+    .blob { position:absolute; border-radius:60% 40% 70% 30%/50% 60% 40% 50%; z-index:0; pointer-events:none; }
+    .blob-1 { width:180px; height:180px; background:rgba(74,222,128,0.12); top:-30px; right:-40px; }
+    .blob-2 { width:140px; height:140px; background:rgba(244,114,182,0.10); top:140px; left:-50px; }
+
+    /* ============================================================
+       CARDS
+    ============================================================ */
+    .card { background:var(--card); border-radius:var(--radius-card); box-shadow:var(--shadow-sm); padding:20px; margin-bottom:14px; position:relative; z-index:1; }
+    .card-accent { border-left:4px solid var(--primary); }
+
+    /* ============================================================
+       SCIENCE BADGES
+    ============================================================ */
+    .sci-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(74,222,128,0.12); color:var(--primary-dark);
+      border-radius:var(--radius-btn); padding:4px 10px;
+      font-size:0.72rem; font-weight:600; margin:3px 2px;
+      border:1px solid rgba(74,222,128,0.25);
+    }
+    .sci-badge.blue   { background:rgba(96,165,250,0.12);  color:#2563EB; border-color:rgba(96,165,250,0.25); }
+    .sci-badge.pink   { background:rgba(244,114,182,0.12); color:#BE185D; border-color:rgba(244,114,182,0.25); }
+    .sci-badge.gold   { background:rgba(251,191,36,0.15);  color:#92400E; border-color:rgba(251,191,36,0.3); }
+    .sci-badge.purple { background:rgba(167,139,250,0.12); color:#5B21B6; border-color:rgba(167,139,250,0.25); }
+    .science-collapse { overflow:hidden; max-height:0; transition:max-height 0.4s ease; }
+    .science-collapse.open { max-height:500px; }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      border:none; border-radius:var(--radius-btn); padding:14px 28px;
+      font-family:'Nunito',sans-serif; font-size:1rem; font-weight:700;
+      cursor:pointer; min-height:52px; width:100%;
+      transition:transform 0.1s,box-shadow 0.1s;
+    }
+    .btn:active { transform:scale(0.96); }
+    .btn-primary { background:var(--primary); color:#fff; box-shadow:0 4px 15px rgba(74,222,128,0.4); }
+    .btn-accent  { background:var(--accent);  color:#fff; box-shadow:0 4px 15px rgba(251,191,36,0.4); }
+    .btn-blue    { background:var(--blue);    color:#fff; box-shadow:0 4px 15px rgba(96,165,250,0.4); }
+    .btn-ghost   { background:transparent; color:var(--text-light); border:2px solid #E2E8F0; box-shadow:none; }
+    .btn-outline { background:transparent; color:var(--primary-dark); border:2px solid var(--primary); box-shadow:none; }
+    .btn-sm      { padding:8px 18px; font-size:0.85rem; min-height:40px; width:auto; }
+    .btn-row     { display:flex; gap:10px; margin-top:14px; }
+    .btn-row .btn { flex:1; }
+
+    /* ============================================================
+       PROGRESS BAR
+    ============================================================ */
+    .progress-wrap { margin-bottom:16px; }
+    .progress-label { display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-light); margin-bottom:6px; font-weight:600; }
+    .progress-bar  { height:12px; background:#E2E8F0; border-radius:var(--radius-btn); overflow:hidden; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:var(--radius-btn); transition:width 0.4s ease; }
+
+    /* ============================================================
+       WORD CARDS
+    ============================================================ */
+    .word-card {
+      background:var(--card); border-radius:var(--radius-card); box-shadow:var(--shadow);
+      padding:24px 20px; margin-bottom:12px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      animation:slideIn 0.22s ease;
+    }
+    @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+    .word-info { flex:1; }
+    .word-es { font-family:'Baloo 2',cursive; font-size:1.6rem; font-weight:800; color:var(--text); line-height:1.2; }
+    .word-en { font-size:0.95rem; color:var(--text-light); margin-top:2px; font-weight:600; }
+    .word-cat {
+      display:inline-block; background:rgba(74,222,128,0.15); color:var(--primary-dark);
+      border-radius:var(--radius-btn); padding:2px 8px;
+      font-size:0.7rem; font-weight:700; margin-top:6px;
+      text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .speak-btn {
+      background:rgba(74,222,128,0.15); border:none; border-radius:50%;
+      width:50px; height:50px; font-size:1.3rem; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      transition:background 0.15s,transform 0.1s;
+    }
+    .speak-btn:active { background:rgba(74,222,128,0.35); transform:scale(0.92); }
+
+    /* ============================================================
+       PHRASE OF DAY
+    ============================================================ */
+    .phrase-card {
+      background:linear-gradient(135deg,var(--primary-dark),var(--blue));
+      border-radius:var(--radius-card); padding:20px; color:white;
+      margin-bottom:14px; position:relative; overflow:hidden;
+    }
+    .phrase-card::before { content:'💬'; font-size:4rem; position:absolute; right:-10px; top:-10px; opacity:0.15; }
+    .phrase-label { font-size:0.75rem; font-weight:700; opacity:0.8; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .phrase-es { font-family:'Baloo 2',cursive; font-size:1.1rem; font-weight:800; margin-bottom:4px; }
+    .phrase-en { font-size:0.88rem; opacity:0.85; }
+
+    /* ============================================================
+       QUIZ
+    ============================================================ */
+    .quiz-question { font-family:'Baloo 2',cursive; font-size:1.3rem; font-weight:800; text-align:center; margin-bottom:8px; }
+    .quiz-sub { text-align:center; color:var(--text-light); font-size:0.85rem; margin-bottom:20px; font-weight:600; }
+    .quiz-options { display:flex; flex-direction:column; gap:10px; }
+    .quiz-option {
+      background:var(--card); border:2px solid #E2E8F0; border-radius:16px;
+      padding:14px 18px; font-family:'Nunito',sans-serif; font-size:1rem;
+      font-weight:600; cursor:pointer; text-align:left;
+      transition:border-color 0.15s,background 0.15s,transform 0.1s; min-height:52px;
+    }
+    .quiz-option:active { transform:scale(0.98); }
+    .quiz-option.correct { background:rgba(74,222,128,0.15); border-color:var(--primary); color:var(--primary-dark); }
+    .quiz-option.wrong   { background:rgba(248,113,113,0.12); border-color:var(--danger); color:#B91C1C; animation:shake 0.35s ease; }
+    .quiz-option.disabled{ pointer-events:none; opacity:0.65; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .feedback-msg { text-align:center; font-weight:700; font-size:0.95rem; padding:10px; border-radius:12px; margin-top:12px; display:none; }
+    .feedback-msg.show-correct { display:block; background:rgba(74,222,128,0.15); color:var(--primary-dark); }
+    .feedback-msg.show-wrong   { display:block; background:rgba(248,113,113,0.12); color:#B91C1C; }
+
+    /* ============================================================
+       RESULT
+    ============================================================ */
+    .score-circle {
+      width:120px; height:120px; border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--accent));
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      margin:0 auto 20px; box-shadow:0 6px 20px rgba(74,222,128,0.4); color:white;
+    }
+    .score-num   { font-family:'Baloo 2',cursive; font-size:2.2rem; font-weight:800; line-height:1; }
+    .score-denom { font-size:0.85rem; opacity:0.85; font-weight:600; }
+
+    /* ============================================================
+       TIP CARD
+    ============================================================ */
+    .tip-card {
+      background:linear-gradient(135deg,#FFF7ED,#FFFBEB);
+      border:1px solid rgba(251,191,36,0.3); border-radius:var(--radius-card);
+      padding:16px 18px; margin-top:14px; font-size:0.88rem; line-height:1.6;
+    }
+    .tip-card small { color:var(--text-light); display:block; margin-top:4px; }
+
+    /* ============================================================
+       BOTTOM NAV
+    ============================================================ */
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:white; border-top:1px solid #F1F5F9;
+      display:flex; box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+      z-index:100; max-width:420px; margin:0 auto;
+    }
+    .nav-btn {
+      flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:10px 4px 12px; background:none; border:none; cursor:pointer;
+      font-family:'Nunito',sans-serif; font-size:0.7rem; font-weight:700;
+      color:var(--text-light); gap:4px; min-height:62px; transition:color 0.15s;
+    }
+    .nav-btn .nav-icon { font-size:1.35rem; line-height:1; }
+    .nav-btn.active { color:var(--primary-dark); }
+
+    /* ============================================================
+       AD BANNER
+    ============================================================ */
+    .ad-banner {
+      background:linear-gradient(90deg,#F8FAFC,#F1F5F9);
+      border:1px dashed #CBD5E1; border-radius:12px; padding:10px 16px;
+      text-align:center; font-size:0.75rem; color:var(--text-light);
+      margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:8px; min-height:52px;
+    }
+
+    /* ============================================================
+       MODAL
+    ============================================================ */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+      z-index:200; align-items:flex-end; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+      background:white; border-radius:24px 24px 0 0; padding:28px 20px 40px;
+      width:100%; max-width:420px; animation:slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    .toast {
+      position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+      background:var(--text); color:white; padding:10px 20px;
+      border-radius:var(--radius-btn); font-size:0.88rem; font-weight:600;
+      z-index:300; opacity:0; transition:opacity 0.25s; white-space:nowrap; pointer-events:none;
+    }
+    .toast.visible { opacity:1; }
+
+    /* ============================================================
+       B1 TOPICS
+    ============================================================ */
+    .b1-topic-card {
+      background:var(--card); border-radius:var(--radius-card); box-shadow:var(--shadow-sm);
+      padding:18px 20px; margin-bottom:12px; display:flex; align-items:center; gap:14px;
+      cursor:pointer; transition:transform 0.15s; border:2px solid transparent;
+    }
+    .b1-topic-card:active { transform:scale(0.98); }
+    .b1-topic-card.done { border-color:var(--primary); background:rgba(74,222,128,0.04); }
+    .b1-icon { font-size:1.6rem; flex-shrink:0; }
+    .b1-title { font-family:'Baloo 2',cursive; font-weight:700; font-size:1rem; }
+    .b1-status { font-size:0.75rem; color:var(--text-light); margin-top:2px; }
+    .example-card {
+      background:#F8FAFC; border-radius:14px; padding:14px 16px;
+      margin-bottom:10px; display:flex; align-items:center; gap:12px;
+    }
+    .example-text { flex:1; }
+    .example-es { font-weight:700; font-size:0.95rem; }
+    .example-en { font-size:0.82rem; color:var(--text-light); margin-top:2px; }
+
+    /* ============================================================
+       SETTINGS
+    ============================================================ */
+    .setting-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:14px 0; border-bottom:1px solid #F1F5F9;
+    }
+    .setting-label { font-weight:600; font-size:0.95rem; }
+    .setting-sub   { font-size:0.78rem; color:var(--text-light); margin-top:2px; }
+    .toggle { position:relative; width:50px; height:28px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0; background:#CBD5E1;
+      border-radius:28px; cursor:pointer; transition:background 0.2s;
+    }
+    .toggle-slider::before {
+      content:''; position:absolute; width:22px; height:22px;
+      left:3px; top:3px; background:white; border-radius:50%;
+      transition:transform 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked + .toggle-slider { background:var(--primary); }
+    .toggle input:checked + .toggle-slider::before { transform:translateX(22px); }
+
+    /* ============================================================
+       MISC
+    ============================================================ */
+    h2 { font-family:'Baloo 2',cursive; font-size:1.4rem; font-weight:800; margin-bottom:14px; }
+    h3 { font-family:'Baloo 2',cursive; font-size:1.05rem; font-weight:700; margin-bottom:10px; }
+    .center { text-align:center; }
+    .divider { height:1px; background:#F1F5F9; margin:16px 0; }
+
+    .cat-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .cat-pill {
+      padding:6px 14px; border-radius:var(--radius-btn); font-size:0.8rem; font-weight:700;
+      cursor:pointer; border:2px solid #E2E8F0; background:white; color:var(--text-light); transition:all 0.15s;
+    }
+    .cat-pill.active { background:var(--primary); border-color:var(--primary); color:white; }
+
+    .nav-card-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .nav-card {
+      background:var(--card); border-radius:18px; padding:18px 14px;
+      text-align:center; cursor:pointer; box-shadow:var(--shadow-sm);
+      transition:transform 0.15s;
+    }
+    .nav-card:active { transform:scale(0.96); }
+    .nav-card .nc-icon  { font-size:1.8rem; margin-bottom:6px; }
+    .nav-card .nc-title { font-family:'Baloo 2',cursive; font-size:0.9rem; font-weight:700; }
+    .nav-card .nc-sub   { font-size:0.72rem; color:var(--text-light); margin-top:2px; }
+
+    .milestone {
+      background:linear-gradient(135deg,#FF9A00,#FF6B6B); color:white;
+      border-radius:var(--radius-card); padding:16px 20px;
+      text-align:center; margin-bottom:14px; display:none;
+    }
+    .milestone.visible { display:block; }
+    .milestone-title { font-family:'Baloo 2',cursive; font-size:1.2rem; font-weight:800; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span class="app-logo">🇪🇸 SpanishSpark</span>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <span id="streak-display" class="streak-badge">🔥 0</span>
+    <span id="pro-badge" class="pro-badge" style="display:none;">⭐ PRO</span>
+  </div>
+</div>
+
+<div class="app">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- ======================================================
+       SCREEN: HOME
+  ====================================================== -->
+  <section id="screen-home" class="screen active">
+
+    <div id="ad-home" class="ad-banner">📢 Ad Space — Google AdSense Ready (320×50)</div>
+
+    <div class="phrase-card">
+      <div class="phrase-label">✨ Phrase of the Day</div>
+      <div class="phrase-es" id="phrase-es">Loading...</div>
+      <div class="phrase-en" id="phrase-en"></div>
+      <button class="speak-btn" id="phrase-speak" style="margin-top:12px;background:rgba(255,255,255,0.2);" aria-label="Speak">🔊</button>
+    </div>
+
+    <div class="milestone" id="milestone-banner">
+      <div class="milestone-title" id="milestone-text">🎉 Milestone!</div>
+      <div style="font-size:0.85rem;margin-top:4px;opacity:0.9;">You're on fire! Keep it up!</div>
+    </div>
+
+    <div class="nav-card-grid">
+      <div class="nav-card" onclick="navTo('screen-lesson');loadLesson();">
+        <div class="nc-icon">📚</div>
+        <div class="nc-title">Today's Lesson</div>
+        <div class="nc-sub">A1 Fundamentals</div>
+      </div>
+      <div class="nav-card" onclick="navTo('screen-b1');renderB1List();">
+        <div class="nc-icon">🎓</div>
+        <div class="nc-title">B1 Grammar</div>
+        <div class="nc-sub">Advanced Level</div>
+      </div>
+    </div>
+
+    <!-- Science card -->
+    <div class="card" style="cursor:pointer;" onclick="toggleScience()">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:700;font-size:0.95rem;">🔬 Science Behind This</span>
+        <span id="sci-arrow" style="font-size:1rem;transition:transform 0.3s;">▼</span>
+      </div>
+      <div class="science-collapse" id="sci-collapse">
+        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="sci-badge">🧠 Spaced repetition boosts recall 200% — Ebbinghaus, 1885</span>
+          <span class="sci-badge blue">📖 Built on SLA Input Hypothesis — Krashen, 1982</span>
+          <span class="sci-badge pink">⚡ Chunking cuts cognitive load — Miller's Law, 1956</span>
+          <span class="sci-badge gold">📅 Daily micro-sessions beat cramming — Distributed Practice</span>
+          <span class="sci-badge purple">🎓 B1 content follows CEFR framework</span>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:10px;line-height:1.6;">
+          SpanishSpark uses decades of cognitive science research. 5–10 minutes daily 
+          is scientifically proven to outperform 1-hour weekly cramming sessions.
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="card" style="text-align:center;padding:16px;">
+        <div style="font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:800;color:var(--primary-dark);" id="home-streak-num">0</div>
+        <div style="font-size:0.78rem;color:var(--text-light);font-weight:600;">Day Streak 🔥</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px;">
+        <div style="font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:800;color:var(--blue);" id="home-longest-num">0</div>
+        <div style="font-size:0.78rem;color:var(--text-light);font-weight:600;">Best Streak 🏆</div>
+      </div>
+    </div>
+
+    <div class="tip-card">
+      💡 <strong>Study faster next time!</strong>
+      Add SpanishSpark to your home screen for instant daily practice.
+      <small>📱 Android: Chrome → ⋮ Menu → "Add to Home Screen"</small>
+      <small>🍎 iPhone: Safari → Share icon → "Add to Home Screen"</small>
+    </div>
+
+  </section>
+
+  <!-- ======================================================
+       SCREEN: LESSON
+  ====================================================== -->
+  <section id="screen-lesson" class="screen">
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button class="btn btn-ghost btn-sm" onclick="navTo('screen-home')" style="width:auto;">← Back</button>
+      <h2 style="margin:0;flex:1;">Today's Lesson</h2>
+    </div>
+
+    <div class="cat-row" id="cat-pills"></div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Word 1 of 7</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <span class="sci-badge">🧠 Spaced repetition boosts recall 200% — Ebbinghaus, 1885</span>
+    </div>
+
+    <div id="word-card-area"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="btn-prev" onclick="prevCard()" disabled>← Prev</button>
+      <button class="btn btn-primary" id="btn-next" onclick="nextCard()">Next →</button>
+    </div>
+
+    <div id="quiz-unlock" style="display:none;margin-top:14px;">
+      <button class="btn btn-accent" onclick="startQuiz()">🧠 Take Quiz</button>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline btn-sm" onclick="openAdModal()">📺 Watch Ad → Unlock Bonus Lesson</button>
+    </div>
+
+  </section>
+
+  <!-- ======================================================
+       SCREEN: QUIZ
+  ====================================================== -->
+  <section id="screen-quiz" class="screen">
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button class="btn btn-ghost btn-sm" onclick="navTo('screen-lesson')" style="width:auto;">← Back</button>
+      <h2 style="margin:0;flex:1;">Mini Quiz 🧠</h2>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="quiz-progress-text">Question 1 of 5</span>
+        <span id="quiz-score-running">Score: 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="quiz-question" id="quiz-question">Loading...</div>
+    <div class="quiz-sub" id="quiz-sub">Choose the correct translation</div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="feedback-msg" id="feedback-msg"></div>
+    <button class="btn btn-primary" id="btn-next-q" style="margin-top:16px;display:none;" onclick="nextQuestion()">Next →</button>
+
+  </section>
+
+  <!-- ======================================================
+       SCREEN: RESULT
+  ====================================================== -->
+  <section id="screen-result" class="screen">
+    <div class="center" style="padding-top:20px;">
+      <div class="score-circle">
+        <div class="score-num" id="result-score">0</div>
+        <div class="score-denom" id="result-total">out of 5</div>
+      </div>
+      <h2 id="result-title">¡Muy bien!</h2>
+      <p id="result-sub" style="color:var(--text-light);margin-bottom:20px;"></p>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <div style="font-size:1.4rem;margin-bottom:4px;">🔥</div>
+      <div style="font-weight:700;">Streak Updated!</div>
+      <div style="font-size:0.85rem;color:var(--text-light);margin-top:4px;" id="result-streak-msg"></div>
+    </div>
+
+    <div class="tip-card">
+      💡 <strong>Study faster next time!</strong>
+      Add SpanishSpark to your home screen for instant daily practice.
+      <small>📱 Android: Chrome → ⋮ → "Add to Home Screen"</small>
+      <small>🍎 iPhone: Safari → Share → "Add to Home Screen"</small>
+    </div>
+
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-ghost" onclick="startQuiz()">🔄 Retry</button>
+      <button class="btn btn-primary" onclick="navTo('screen-home')">🏠 Home</button>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       SCREEN: B1 GRAMMAR
+  ====================================================== -->
+  <section id="screen-b1" class="screen">
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button class="btn btn-ghost btn-sm" onclick="navTo('screen-home')" style="width:auto;">← Back</button>
+      <h2 style="margin:0;flex:1;">B1 Grammar 🎓</h2>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <span class="sci-badge purple">🎓 Aligned with CEFR Framework (B1 Level)</span>
+    </div>
+
+    <div id="b1-list"></div>
+    <div id="b1-detail" style="display:none;"></div>
+
+  </section>
+
+  <!-- ======================================================
+       SCREEN: SETTINGS
+  ====================================================== -->
+  <section id="screen-settings" class="screen">
+    <h2>Settings ⚙️</h2>
+
+    <div class="card">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Quiz Direction</div>
+          <div class="setting-sub" id="quiz-dir-label">Spanish → English</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="dir-toggle" onchange="toggleQuizDir(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">⭐ Pro Mode (Remove Ads)</div>
+          <div class="setting-sub">Simulate paid plan</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="pro-toggle" onchange="togglePaid(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row" style="border:none;">
+        <div>
+          <div class="setting-label">📅 Streak Info</div>
+          <div class="setting-sub">Current: <span id="set-streak">0</span> · Best: <span id="set-longest">0</span> days</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="resetStreak()" style="width:auto;">Reset</button>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         BACKEND INTEGRATION GUIDE (visible in UI)
+    ================================================================ -->
+    <div class="card card-accent" style="margin-top:8px;">
+      <h3 style="margin-bottom:8px;">🔌 Backend-Ready</h3>
+      <div style="font-size:0.82rem;color:var(--text-light);line-height:1.7;">
+        All data goes through the <strong>API layer</strong> in the JS code.<br>
+        When you add a backend, just replace <code>API.save()</code> and <code>API.load()</code>
+        with your own <code>fetch()</code> calls — the rest of the app stays untouched.<br><br>
+        <strong>Steps to add backend:</strong><br>
+        1. Build your REST API (Node/Express, Django, Laravel, etc.)<br>
+        2. Add auth token to <code>API.token</code><br>
+        3. Swap <code>API.save/load</code> to call <code>/api/user/data</code><br>
+        4. Deploy backend separately — keep this on GitHub Pages
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:8px;">
+      <div style="font-size:0.8rem;color:var(--text-light);line-height:1.7;">
+        <strong>SpanishSpark v1.0.0</strong><br>
+        Built on SLA research (Krashen, 1982), spaced repetition (Ebbinghaus, 1885),
+        chunking (Miller, 1956), and distributed practice theory.
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.app -->
+
+<!-- FIXED BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="navTo('screen-home')">
+    <span class="nav-icon">🏠</span>Home
+  </button>
+  <button class="nav-btn" id="nav-lesson" onclick="navTo('screen-lesson');loadLesson();">
+    <span class="nav-icon">📚</span>Lesson
+  </button>
+  <button class="nav-btn" id="nav-b1" onclick="navTo('screen-b1');renderB1List();">
+    <span class="nav-icon">🎓</span>B1
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="navTo('screen-settings');renderSettings();">
+    <span class="nav-icon">⚙️</span>Settings
+  </button>
+</nav>
+
+<!-- WATCH AD MODAL -->
+<div class="modal-overlay" id="ad-modal">
+  <div class="modal-box">
+    <div style="font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;margin-bottom:8px;">📺 Unlock Bonus Lesson</div>
+    <p style="font-size:0.88rem;color:var(--text-light);margin-bottom:16px;">Watch this short ad to unlock a bonus lesson for free!</p>
+    <div id="ad-countdown" style="text-align:center;font-family:'Baloo 2',cursive;font-size:2.5rem;font-weight:800;color:var(--primary-dark);margin-bottom:12px;">5</div>
+    <div style="background:#F1F5F9;border-radius:12px;padding:18px;text-align:center;margin-bottom:16px;font-size:0.85rem;color:var(--text-light);">
+      📢 [Ad Placeholder — Connect Google AdMob / AdSense here]
+    </div>
+    <button class="btn btn-primary" id="ad-claim-btn" onclick="claimAdReward()" style="display:none;">🎁 Claim Bonus Lesson</button>
+    <button class="btn btn-ghost" onclick="closeAdModal()" style="margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   ╔══════════════════════════════════════════════════════════════╗
+   ║  API LAYER — BACKEND INTEGRATION POINT                      ║
+   ║                                                             ║
+   ║  Currently uses localStorage. To connect your backend:      ║
+   ║                                                             ║
+   ║  1. Set API.token after user logs in:                       ║
+   ║     API.token = 'your-jwt-token-here';                      ║
+   ║                                                             ║
+   ║  2. Replace save() with:                                    ║
+   ║     async save(key, value) {                                ║
+   ║       await fetch('https://yourapi.com/data', {             ║
+   ║         method: 'POST',                                     ║
+   ║         headers: {                                          ║
+   ║           'Content-Type': 'application/json',               ║
+   ║           'Authorization': 'Bearer ' + this.token           ║
+   ║         },                                                  ║
+   ║         body: JSON.stringify({ key, value })                ║
+   ║       });                                                   ║
+   ║     }                                                       ║
+   ║                                                             ║
+   ║  3. Replace load() with:                                    ║
+   ║     async load(key, fallback) {                             ║
+   ║       const r = await fetch(                                ║
+   ║         'https://yourapi.com/data/' + key,                  ║
+   ║         { headers: { 'Authorization': 'Bearer '+this.token}}║
+   ║       );                                                    ║
+   ║       const d = await r.json();                             ║
+   ║       return d.value ?? fallback;                           ║
+   ║     }                                                       ║
+   ║                                                             ║
+   ║  4. All functions that call API.load/save will work         ║
+   ║     automatically — no other changes needed.                ║
+   ╚══════════════════════════════════════════════════════════════╝
+*/
+const API = {
+  token: null, // BACKEND: set this after login → API.token = 'jwt-here';
+
+  save(key, value) {
+    /* BACKEND: replace this block with fetch() POST */
+    try { localStorage.setItem('ss_' + key, JSON.stringify(value)); }
+    catch(e) { console.warn('[API] Save failed:', e); }
+  },
+
+  load(key, fallback = null) {
+    /* BACKEND: replace this block with fetch() GET */
+    try {
+      const item = localStorage.getItem('ss_' + key);
+      return item !== null ? JSON.parse(item) : fallback;
+    } catch(e) { return fallback; }
+  },
+
+  remove(key) {
+    /* BACKEND: replace with DELETE fetch() */
+    try { localStorage.removeItem('ss_' + key); }
+    catch(e) {}
+  }
+};
+
+/* ================================================================
+   WORD BANK — A1 Fundamentals
+================================================================ */
+const lessonBank = [
+  // SURVIVAL
+  {es:'Hola',en:'Hello',cat:'Survival'},
+  {es:'Adiós',en:'Goodbye',cat:'Survival'},
+  {es:'Por favor',en:'Please',cat:'Survival'},
+  {es:'Gracias',en:'Thank you',cat:'Survival'},
+  {es:'De nada',en:"You're welcome",cat:'Survival'},
+  {es:'Lo siento',en:"I'm sorry",cat:'Survival'},
+  {es:'Perdón',en:'Excuse me',cat:'Survival'},
+  {es:'Buenos días',en:'Good morning',cat:'Survival'},
+  {es:'Buenas tardes',en:'Good afternoon',cat:'Survival'},
+  {es:'Buenas noches',en:'Good night',cat:'Survival'},
+  // PRONOUNS
+  {es:'Yo',en:'I',cat:'Pronoun'},
+  {es:'Tú',en:'You',cat:'Pronoun'},
+  {es:'Él',en:'He',cat:'Pronoun'},
+  {es:'Ella',en:'She',cat:'Pronoun'},
+  {es:'Nosotros',en:'We',cat:'Pronoun'},
+  {es:'Vosotros',en:'You all (Spain)',cat:'Pronoun'},
+  {es:'Ellos',en:'They',cat:'Pronoun'},
+  {es:'Usted',en:'You (formal)',cat:'Pronoun'},
+  // NOUNS
+  {es:'Casa',en:'House',cat:'Noun'},
+  {es:'Escuela',en:'School',cat:'Noun'},
+  {es:'Comida',en:'Food',cat:'Noun'},
+  {es:'Amigo',en:'Friend',cat:'Noun'},
+  {es:'Familia',en:'Family',cat:'Noun'},
+  {es:'Coche',en:'Car',cat:'Noun'},
+  {es:'Ciudad',en:'City',cat:'Noun'},
+  {es:'País',en:'Country',cat:'Noun'},
+  {es:'Libro',en:'Book',cat:'Noun'},
+  {es:'Teléfono',en:'Phone',cat:'Noun'},
+  {es:'Dinero',en:'Money',cat:'Noun'},
+  {es:'Agua',en:'Water',cat:'Noun'},
+  {es:'Trabajo',en:'Work / Job',cat:'Noun'},
+  {es:'Tiempo',en:'Time / Weather',cat:'Noun'},
+  {es:'Nombre',en:'Name',cat:'Noun'},
+  // CONNECTORS
+  {es:'Y',en:'And',cat:'Connector'},
+  {es:'Pero',en:'But',cat:'Connector'},
+  {es:'Porque',en:'Because',cat:'Connector'},
+  {es:'Entonces',en:'So / Then',cat:'Connector'},
+  {es:'También',en:'Also',cat:'Connector'},
+  {es:'Sin embargo',en:'However',cat:'Connector'},
+  {es:'Aunque',en:'Although',cat:'Connector'},
+  {es:'Si',en:'If',cat:'Connector'},
+  // CHUNKS
+  {es:'¿Cómo estás?',en:'How are you?',cat:'Chunk'},
+  {es:'Mucho gusto',en:'Nice to meet you',cat:'Chunk'},
+  {es:'Me gusta...',en:'I like...',cat:'Chunk'},
+  {es:'Yo soy...',en:'I am...',cat:'Chunk'},
+  {es:'Tengo...',en:'I have...',cat:'Chunk'},
+  {es:'Me llamo...',en:'My name is...',cat:'Chunk'},
+  {es:'¿Puedes ayudarme?',en:'Can you help me?',cat:'Chunk'},
+  {es:'No entiendo',en:"I don't understand",cat:'Chunk'},
+  {es:'¿Cómo se dice...?',en:'How do you say...?',cat:'Chunk'},
+  {es:'Estoy aprendiendo español',en:'I am learning Spanish',cat:'Chunk'},
+  // QUESTIONS
+  {es:'¿Qué?',en:'What?',cat:'Question'},
+  {es:'¿Quién?',en:'Who?',cat:'Question'},
+  {es:'¿Dónde?',en:'Where?',cat:'Question'},
+  {es:'¿Cuándo?',en:'When?',cat:'Question'},
+  {es:'¿Por qué?',en:'Why?',cat:'Question'},
+  {es:'¿Cómo?',en:'How?',cat:'Question'},
+  {es:'¿Cuánto cuesta?',en:'How much does it cost?',cat:'Question'},
+  {es:'¿Hablas inglés?',en:'Do you speak English?',cat:'Question'},
+  {es:'¿A qué hora?',en:'At what time?',cat:'Question'},
+  // GREETINGS & COMPLIMENTS
+  {es:'Hasta luego',en:'See you later',cat:'Greeting'},
+  {es:'Hasta mañana',en:'See you tomorrow',cat:'Greeting'},
+  {es:'¡Buen trabajo!',en:'Good job!',cat:'Compliment'},
+  {es:'¡Excelente!',en:'Excellent!',cat:'Compliment'},
+  {es:'¡Muy bien!',en:'Very good!',cat:'Compliment'},
+  {es:'¡Increíble!',en:'Incredible!',cat:'Compliment'},
+];
+
+const phrasePool = [
+  {es:'El que no arriesga, no gana.',en:'Nothing ventured, nothing gained.'},
+  {es:'Poco a poco se llega lejos.',en:'Little by little, you go far.'},
+  {es:'La práctica hace al maestro.',en:'Practice makes perfect.'},
+  {es:'Querer es poder.',en:'Where there is a will, there is a way.'},
+  {es:'Cada día es una nueva oportunidad.',en:'Every day is a new opportunity.'},
+  {es:'Hoy es un buen día para aprender.',en:'Today is a good day to learn.'},
+  {es:'El conocimiento es poder.',en:'Knowledge is power.'},
+];
+
+const b1Topics = [
+  {
+    id:'ser-estar',icon:'⚖️',title:'Ser vs. Estar',
+    explanation:'Both mean "to be." <strong>SER</strong> = permanent (identity, origin, job). <strong>ESTAR</strong> = temporary (feelings, location).',
+    sciLabel:'📖 SLA Input Hypothesis — Krashen, 1982',
+    examples:[
+      {es:'Yo soy médico.',en:'I am a doctor. (SER — job)'},
+      {es:'Yo estoy cansado.',en:'I am tired. (ESTAR — feeling)'},
+      {es:'Madrid es la capital.',en:'Madrid is the capital. (SER — fact)'},
+      {es:'Ella está en casa.',en:'She is at home. (ESTAR — location)'},
+    ],
+    quiz:[
+      {q:'I am a teacher.',fill:'Yo ___ profesor.',options:['soy','estoy','es','está'],correct:0},
+      {q:'She is happy.',fill:'Ella ___ feliz.',options:['es','soy','está','estás'],correct:2},
+      {q:'We are friends.',fill:'Nosotros ___ amigos.',options:['somos','estamos','son','están'],correct:0},
+    ]
+  },
+  {
+    id:'preterite-imperfect',icon:'⏰',title:'Preterite vs. Imperfect',
+    explanation:'<strong>PRETERITE</strong> = completed past action. <strong>IMPERFECT</strong> = habitual or ongoing past (used to / was doing).',
+    sciLabel:'⚡ Chunking reduces cognitive load — Miller\'s Law, 1956',
+    examples:[
+      {es:'Ayer comí pizza.',en:'Yesterday I ate pizza. (Preterite)'},
+      {es:'De niño comía mucho.',en:'As a child I used to eat a lot. (Imperfect)'},
+      {es:'Ella llegó a las 8.',en:'She arrived at 8. (Preterite)'},
+      {es:'Siempre llegaba tarde.',en:'She always arrived late. (Imperfect)'},
+    ],
+    quiz:[
+      {q:'Yesterday I spoke Spanish.',fill:'Ayer ___ español.',options:['hablaba','hablé','habla','hablo'],correct:1},
+      {q:'I used to live in Madrid.',fill:'___ en Madrid.',options:['Viví','Vivo','Vivía','Vivimos'],correct:2},
+      {q:'They arrived late.',fill:'Ellos ___ tarde.',options:['llegaban','llegaron','llegan','llegar'],correct:1},
+    ]
+  },
+  {
+    id:'subjunctive',icon:'🌀',title:'Subjunctive Mood',
+    explanation:'Used for wishes, doubt, or emotion. Triggered by: <em>quiero que…, espero que…, es importante que…</em>',
+    sciLabel:'🧠 Spaced repetition — Ebbinghaus, 1885',
+    examples:[
+      {es:'Quiero que vengas.',en:'I want you to come.'},
+      {es:'Espero que estudies.',en:'I hope you study.'},
+      {es:'Es importante que practiques.',en:'It is important that you practice.'},
+      {es:'Ojalá hable bien.',en:'Hopefully I speak well.'},
+    ],
+    quiz:[
+      {q:'I want you to eat.',fill:'Quiero que ___.',options:['comes','comas','comer','como'],correct:1},
+      {q:'I hope he comes.',fill:'Espero que ___.',options:['viene','venga','venir','vine'],correct:1},
+    ]
+  },
+  {
+    id:'object-pronouns',icon:'🎯',title:'Object Pronouns',
+    explanation:'<strong>Direct:</strong> lo, la, los, las. <strong>Indirect:</strong> le, les (person receiving the action).',
+    sciLabel:'📅 Distributed Practice Theory',
+    examples:[
+      {es:'Lo veo.',en:'I see it/him.'},
+      {es:'La llamo.',en:'I call her.'},
+      {es:'Le doy el libro.',en:'I give him/her the book.'},
+      {es:'Les escribo.',en:'I write to them.'},
+    ],
+    quiz:[
+      {q:'I see her.',fill:'___ veo.',options:['Lo','La','Le','Les'],correct:1},
+      {q:'I call them.',fill:'___ llamo.',options:['Lo','La','Les','Le'],correct:2},
+      {q:'I give him.',fill:'___ doy el libro.',options:['Lo','La','Les','Le'],correct:3},
+    ]
+  },
+  {
+    id:'reflexive-verbs',icon:'🔄',title:'Reflexive Verbs',
+    explanation:'Subject acts on itself. Use pronouns <strong>me, te, se, nos, os</strong> before the verb.',
+    sciLabel:'🎓 CEFR Framework (B1 Level)',
+    examples:[
+      {es:'Me llamo Ana.',en:'My name is Ana.'},
+      {es:'Me levanto a las 7.',en:'I get up at 7.'},
+      {es:'Ella se ducha por la mañana.',en:'She showers in the morning.'},
+      {es:'Nos acostamos tarde.',en:'We go to bed late.'},
+    ],
+    quiz:[
+      {q:'I wash myself.',fill:'___ lavo.',options:['Te','Me','Se','Nos'],correct:1},
+      {q:'She gets dressed.',fill:'Ella ___ viste.',options:['me','te','se','nos'],correct:2},
+      {q:'We wake up.',fill:'___ despertamos.',options:['Me','Te','Se','Nos'],correct:3},
+    ]
+  },
+];
+
+/* ================================================================
+   TTS — SPEECH SYNTHESIS
+   iOS fix: speakSpanish() must ALWAYS be called directly from a click event.
+   Never wrap in setTimeout/Promise.
+================================================================ */
+let voices = [];
+function loadVoices() {
+  if (!window.speechSynthesis) return;
+  voices = window.speechSynthesis.getVoices();
+}
+loadVoices();
+if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speakSpanish(text) {
+  if (!window.speechSynthesis) {
+    showToast('🔇 Audio not supported in this browser. Open in Chrome!');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang  = 'es-ES';
+  u.rate  = 0.85;
+  u.pitch = 1;
+  const v = voices.find(v => v.lang.startsWith('es'));
+  if (v) u.voice = v;
+  window.speechSynthesis.speak(u);
+}
+
+/* ================================================================
+   SCREEN / NAV
+================================================================ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function navTo(id) {
+  showScreen(id);
+  const map = {'screen-home':'nav-home','screen-lesson':'nav-lesson','screen-b1':'nav-b1','screen-settings':'nav-settings','screen-quiz':null,'screen-result':null};
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (map[id]) document.getElementById(map[id]).classList.add('active');
+}
+
+/* ================================================================
+   STREAK
+================================================================ */
+function updateStreak() {
+  const today   = new Date().toDateString();
+  let streak    = API.load('streak', 0);
+  let lastDate  = API.load('lastStudyDate', null);
+  let longest   = API.load('longestStreak', 0);
+  if (!lastDate) {
+    streak = 1;
+  } else if (lastDate === today) {
+    return streak;
+  } else {
+    const diff = Math.round((new Date(today) - new Date(lastDate)) / 86400000);
+    streak = diff === 1 ? streak + 1 : 1;
+  }
+  if (streak > longest) longest = streak;
+  API.save('streak', streak);
+  API.save('lastStudyDate', today);
+  API.save('longestStreak', longest);
+  return streak;
+}
+
+function renderStreakUI() {
+  const s = API.load('streak', 0);
+  const l = API.load('longestStreak', 0);
+  document.getElementById('streak-display').textContent   = '🔥 ' + s;
+  document.getElementById('home-streak-num').textContent  = s;
+  document.getElementById('home-longest-num').textContent = l;
+  checkMilestone(s);
+}
+
+function checkMilestone(s) {
+  const m = {3:'🎉 3-Day Streak!',7:'🔥 7-Day Streak!',14:'💎 14-Day Streak!',30:'👑 30-Day Streak!'};
+  const b = document.getElementById('milestone-banner');
+  if (m[s]) {
+    document.getElementById('milestone-text').textContent = m[s];
+    b.classList.add('visible');
+    setTimeout(() => b.classList.remove('visible'), 5000);
+  }
+}
+
+function resetStreak() {
+  if (!confirm('Reset your streak to zero?')) return;
+  API.save('streak',0); API.save('longestStreak',0); API.remove('lastStudyDate');
+  renderStreakUI(); renderSettings(); showToast('Streak reset.');
+}
+
+/* ================================================================
+   LESSON
+================================================================ */
+let currentWords = [], currentCardIdx = 0, currentCat = 'All';
+const WORDS_PER_DAY = 7;
+
+function getDayWords() {
+  const day = API.load('currentDay', 0);
+  const bank = currentCat === 'All' ? lessonBank : lessonBank.filter(w => w.cat === currentCat);
+  const start = (day * WORDS_PER_DAY) % bank.length;
+  return Array.from({length: WORDS_PER_DAY}, (_, i) => bank[(start + i) % bank.length]);
+}
+
+function loadLesson() {
+  currentCat = 'All'; currentCardIdx = 0; currentWords = getDayWords();
+  document.getElementById('btn-next').style.display = 'flex';
+  document.getElementById('quiz-unlock').style.display = 'none';
+  renderCatPills(); renderWordCard();
+}
+
+function renderCatPills() {
+  const cats = ['All', ...new Set(lessonBank.map(w => w.cat))];
+  document.getElementById('cat-pills').innerHTML = cats.map(c =>
+    `<button class="cat-pill${c===currentCat?' active':''}" onclick="selectCat('${c}')">${c}</button>`
+  ).join('');
+}
+
+function selectCat(cat) {
+  currentCat = cat; currentCardIdx = 0; currentWords = getDayWords();
+  document.getElementById('btn-next').style.display = 'flex';
+  document.getElementById('quiz-unlock').style.display = 'none';
+  renderCatPills(); renderWordCard();
+}
+
+function renderWordCard() {
+  const w = currentWords[currentCardIdx], total = currentWords.length;
+  const pct = Math.round(((currentCardIdx+1)/total)*100);
+  document.getElementById('progress-text').textContent = `Word ${currentCardIdx+1} of ${total}`;
+  document.getElementById('progress-pct').textContent  = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('word-card-area').innerHTML = `
+    <div class="word-card">
+      <div class="word-info">
+        <div class="word-es">${w.es}</div>
+        <div class="word-en">${w.en}</div>
+        <span class="word-cat">${w.cat}</span>
+      </div>
+      <button class="speak-btn" id="card-speak" aria-label="Pronounce">🔊</button>
+    </div>`;
+  // Direct event listener — required for iOS
+  document.getElementById('card-speak').addEventListener('click', function() { speakSpanish(w.es); });
+  document.getElementById('btn-prev').disabled = currentCardIdx === 0;
+  document.getElementById('btn-next').textContent = currentCardIdx === total-1 ? '✓ Done' : 'Next →';
+}
+
+function nextCard() {
+  if (currentCardIdx < currentWords.length - 1) {
+    currentCardIdx++; renderWordCard();
+  } else {
+    const day = API.load('currentDay', 0);
+    let prog = API.load('lessonProgress', {}); prog[day] = true;
+    API.save('lessonProgress', prog); API.save('currentDay', day + 1);
+    document.getElementById('quiz-unlock').style.display = 'block';
+    document.getElementById('btn-next').style.display = 'none';
+    document.getElementById('word-card-area').innerHTML = `
+      <div class="card" style="text-align:center;padding:28px 20px;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">🎊</div>
+        <div style="font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;">Lesson Complete!</div>
+        <div style="color:var(--text-light);font-size:0.85rem;margin-top:6px;">You studied ${currentWords.length} words today. ¡Excelente!</div>
+        <div style="margin-top:12px;"><span class="sci-badge">📅 Daily micro-sessions beat cramming — Distributed Practice Theory</span></div>
+      </div>`;
+  }
+}
+
+function prevCard() {
+  if (currentCardIdx > 0) {
+    currentCardIdx--;
+    document.getElementById('btn-next').style.display = 'flex';
+    renderWordCard();
+  }
+}
+
+/* ================================================================
+   QUIZ
+================================================================ */
+let quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+function generateQuiz(words, dir, count = 5) {
+  const pool = [...words].sort(() => Math.random()-0.5).slice(0, count);
+  return pool.map(w => {
+    const isES = dir === 'ES_TO_EN';
+    const q = isES ? w.es : w.en, a = isES ? w.en : w.es;
+    const wrong = lessonBank.filter(x => x.es !== w.es).sort(() => Math.random()-0.5).slice(0,3).map(x => isES ? x.en : x.es);
+    return {question: q, answer: a, options: [...wrong, a].sort(() => Math.random()-0.5)};
+  });
+}
+
+function startQuiz() {
+  const dir = API.load('quizDirection', 'ES_TO_EN');
+  const pool = currentWords.length >= 5 ? currentWords : lessonBank.slice(0,15);
+  quizQs = generateQuiz(pool, dir); quizIdx = 0; quizScore = 0; quizAnswered = false;
+  navTo('screen-quiz'); renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizQs[quizIdx], total = quizQs.length;
+  document.getElementById('quiz-progress-text').textContent = `Question ${quizIdx+1} of ${total}`;
+  document.getElementById('quiz-score-running').textContent = `Score: ${quizScore}`;
+  document.getElementById('quiz-progress-fill').style.width = `${(quizIdx/total)*100}%`;
+  document.getElementById('quiz-question').textContent = q.question;
+  document.getElementById('quiz-sub').textContent = API.load('quizDirection','ES_TO_EN') === 'ES_TO_EN' ? 'Choose the English translation' : 'Choose the Spanish translation';
+  document.getElementById('feedback-msg').className = 'feedback-msg';
+  document.getElementById('btn-next-q').style.display = 'none';
+  quizAnswered = false;
+  document.getElementById('quiz-options').innerHTML = q.options.map((o,i) =>
+    `<button class="quiz-option" id="opt-${i}" onclick="checkAnswer(${i})">${o}</button>`
+  ).join('');
+}
+
+function checkAnswer(idx) {
+  if (quizAnswered) return; quizAnswered = true;
+  const q = quizQs[quizIdx], correct = q.options[idx] === q.answer;
+  document.querySelectorAll('.quiz-option').forEach(b => b.classList.add('disabled'));
+  if (correct) {
+    document.getElementById('opt-'+idx).classList.add('correct'); quizScore++;
+    document.getElementById('quiz-score-running').textContent = `Score: ${quizScore}`;
+    const m = document.getElementById('feedback-msg');
+    m.textContent = '✅ ¡Correcto! Well done!'; m.className = 'feedback-msg show-correct';
+  } else {
+    document.getElementById('opt-'+idx).classList.add('wrong');
+    q.options.forEach((o,i) => { if (o===q.answer) document.getElementById('opt-'+i).classList.add('correct'); });
+    const m = document.getElementById('feedback-msg');
+    m.textContent = `❌ The answer was: "${q.answer}"`; m.className = 'feedback-msg show-wrong';
+  }
+  document.getElementById('btn-next-q').style.display = 'flex';
+}
+
+function nextQuestion() {
+  quizIdx++;
+  if (quizIdx < quizQs.length) { renderQuestion(); } else { finishQuiz(); }
+}
+
+function finishQuiz() {
+  let scores = API.load('quizScores', []); scores.push(quizScore);
+  if (scores.length > 20) scores.shift(); API.save('quizScores', scores);
+  const streak = updateStreak(); renderStreakUI();
+  const total = quizQs.length, pct = Math.round((quizScore/total)*100);
+  let title, sub;
+  if (pct===100) { title='¡Perfecto! 🎉'; sub='You got everything right! Incredible!'; }
+  else if (pct>=80) { title='¡Muy bien! 🌟'; sub='Almost perfect — keep it up!'; }
+  else if (pct>=60) { title='¡Bien hecho! 👍'; sub='Good effort! Review and try again.'; }
+  else { title='¡Sigue practicando! 💪'; sub='Don\'t give up — repetition is the key!'; }
+  document.getElementById('result-score').textContent = quizScore;
+  document.getElementById('result-total').textContent = 'out of ' + total;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-sub').textContent   = sub;
+  document.getElementById('result-streak-msg').textContent = `🔥 ${streak}-day streak!`;
+  navTo('screen-result');
+}
+
+/* ================================================================
+   B1 GRAMMAR
+================================================================ */
+let b1Quiz = [], b1QuizIdx = 0, b1QuizScore = 0, currentTopicId = null;
+
+function renderB1List() {
+  document.getElementById('b1-list').style.display   = 'block';
+  document.getElementById('b1-detail').style.display = 'none';
+  const prog = API.load('b1Progress', {});
+  document.getElementById('b1-list').innerHTML = b1Topics.map(t => `
+    <div class="b1-topic-card${prog[t.id]?' done':''}" onclick="loadB1Topic('${t.id}')">
+      <div class="b1-icon">${t.icon}</div>
+      <div><div class="b1-title">${t.title}</div><div class="b1-status">${prog[t.id]?'✅ Completed':'○ Not started'}</div></div>
+      <div style="margin-left:auto;color:var(--text-light);font-size:1.1rem;">›</div>
+    </div>`).join('');
+}
+
+function loadB1Topic(id) {
+  const t = b1Topics.find(x => x.id === id); if (!t) return;
+  currentTopicId = id; b1Quiz = [...t.quiz]; b1QuizIdx = 0; b1QuizScore = 0;
+  document.getElementById('b1-list').style.display   = 'none';
+  document.getElementById('b1-detail').style.display = 'block';
+  document.getElementById('b1-detail').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="renderB1List()" style="width:auto;margin-bottom:14px;">← All Topics</button>
+    <h2>${t.icon} ${t.title}</h2>
+    <span class="sci-badge blue" style="margin-bottom:14px;display:inline-block;">${t.sciLabel}</span>
+    <div class="card card-accent" style="margin-bottom:14px;">
+      <h3>📖 Explanation</h3>
+      <p style="font-size:0.9rem;line-height:1.7;">${t.explanation}</p>
+    </div>
+    <h3 style="margin-bottom:10px;">🗣️ Examples</h3>
+    ${t.examples.map((ex,i) => `
+      <div class="example-card">
+        <div class="example-text">
+          <div class="example-es">${ex.es}</div>
+          <div class="example-en">${ex.en}</div>
+        </div>
+        <button class="speak-btn" id="b1s${i}" aria-label="Speak">🔊</button>
+      </div>`).join('')}
+    <div class="divider"></div>
+    <h3 style="margin-bottom:12px;">🧠 Mini Quiz</h3>
+    <div id="b1-quiz-area"></div>`;
+  // Attach speak buttons directly (iOS fix)
+  t.examples.forEach((ex,i) => {
+    document.getElementById('b1s'+i).addEventListener('click', function(){ speakSpanish(ex.es); });
+  });
+  renderB1Question();
+}
+
+function renderB1Question() {
+  const area = document.getElementById('b1-quiz-area');
+  if (b1QuizIdx >= b1Quiz.length) {
+    let prog = API.load('b1Progress', {}); prog[currentTopicId] = true;
+    API.save('b1Progress', prog);
+    area.innerHTML = `
+      <div class="card" style="text-align:center;padding:24px;">
+        <div style="font-size:2rem;margin-bottom:8px;">🎓</div>
+        <div style="font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;">Quiz Complete!</div>
+        <div style="color:var(--text-light);margin:8px 0;">Score: ${b1QuizScore} / ${b1Quiz.length}</div>
+        <button class="btn btn-primary" onclick="b1QuizIdx=0;b1QuizScore=0;renderB1Question();" style="margin-top:10px;">🔄 Retry</button>
+      </div>`;
+    return;
+  }
+  const q = b1Quiz[b1QuizIdx];
+  area.innerHTML = `
+    <div class="card">
+      <div style="font-size:0.78rem;color:var(--text-light);font-weight:600;margin-bottom:6px;">Question ${b1QuizIdx+1} of ${b1Quiz.length}</div>
+      <div class="quiz-question" style="text-align:left;font-size:1rem;margin-bottom:4px;">${q.q}</div>
+      <div style="font-size:0.85rem;color:var(--text-light);margin-bottom:14px;">${q.fill}</div>
+      <div class="quiz-options" id="b1-opts">${q.options.map((o,i) =>
+        `<button class="quiz-option" id="b1o${i}" onclick="checkB1Answer(${i})">${o}</button>`
+      ).join('')}</div>
+      <div class="feedback-msg" id="b1-fb"></div>
+      <button class="btn btn-primary" id="b1-nxt" style="margin-top:12px;display:none;" onclick="b1QuizIdx++;renderB1Question();">Next →</button>
+    </div>`;
+}
+
+function checkB1Answer(idx) {
+  const q = b1Quiz[b1QuizIdx];
+  document.querySelectorAll('#b1-opts .quiz-option').forEach(b => b.classList.add('disabled'));
+  if (idx === q.correct) {
+    document.getElementById('b1o'+idx).classList.add('correct'); b1QuizScore++;
+    const m = document.getElementById('b1-fb'); m.textContent='✅ ¡Correcto!'; m.className='feedback-msg show-correct';
+  } else {
+    document.getElementById('b1o'+idx).classList.add('wrong');
+    document.getElementById('b1o'+q.correct).classList.add('correct');
+    const m = document.getElementById('b1-fb'); m.textContent=`❌ Correct: "${q.options[q.correct]}"`; m.className='feedback-msg show-wrong';
+  }
+  document.getElementById('b1-nxt').style.display = 'flex';
+}
+
+/* ================================================================
+   SETTINGS
+================================================================ */
+function renderSettings() {
+  document.getElementById('set-streak').textContent  = API.load('streak', 0);
+  document.getElementById('set-longest').textContent = API.load('longestStreak', 0);
+  document.getElementById('pro-toggle').checked = API.load('isPaidUser', false);
+  const dir = API.load('quizDirection', 'ES_TO_EN');
+  document.getElementById('dir-toggle').checked = dir === 'EN_TO_ES';
+  document.getElementById('quiz-dir-label').textContent = dir === 'ES_TO_EN' ? 'Spanish → English' : 'English → Spanish';
+  document.getElementById('pro-badge').style.display = API.load('isPaidUser', false) ? 'inline-flex' : 'none';
+}
+
+function togglePaid(val) {
+  API.save('isPaidUser', val);
+  document.getElementById('pro-badge').style.display = val ? 'inline-flex' : 'none';
+  checkAdDisplay();
+  showToast(val ? '⭐ Pro activated! Ads removed.' : 'Switched to Free plan.');
+}
+
+function toggleQuizDir(checked) {
+  const dir = checked ? 'EN_TO_ES' : 'ES_TO_EN';
+  API.save('quizDirection', dir);
+  document.getElementById('quiz-dir-label').textContent = checked ? 'English → Spanish' : 'Spanish → English';
+  showToast('Quiz direction updated!');
+}
+
+/* ================================================================
+   ADS
+================================================================ */
+function checkAdDisplay() {
+  const paid = API.load('isPaidUser', false);
+  const ad = document.getElementById('ad-home');
+  if (ad) ad.style.display = paid ? 'none' : 'flex';
+}
+
+let adTimer = null;
+function openAdModal() {
+  document.getElementById('ad-modal').classList.add('open');
+  let count = 5;
+  document.getElementById('ad-countdown').textContent = count;
+  document.getElementById('ad-claim-btn').style.display = 'none';
+  adTimer = setInterval(() => {
+    count--;
+    document.getElementById('ad-countdown').textContent = count;
+    if (count <= 0) { clearInterval(adTimer); document.getElementById('ad-countdown').textContent='✓'; document.getElementById('ad-claim-btn').style.display='flex'; }
+  }, 1000);
+}
+function closeAdModal() { clearInterval(adTimer); document.getElementById('ad-modal').classList.remove('open'); }
+function claimAdReward() { API.save('bonusLesson',true); closeAdModal(); showToast('🎁 Bonus lesson unlocked!'); }
+
+/* ================================================================
+   SCIENCE TOGGLE
+================================================================ */
+function toggleScience() {
+  const el = document.getElementById('sci-collapse'), a = document.getElementById('sci-arrow');
+  el.classList.toggle('open');
+  a.style.transform = el.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+/* ================================================================
+   PHRASE OF DAY
+================================================================ */
+function renderPhraseOfDay() {
+  const p = phrasePool[new Date().getDate() % phrasePool.length];
+  document.getElementById('phrase-es').textContent = p.es;
+  document.getElementById('phrase-en').textContent = p.en;
+  document.getElementById('phrase-speak').addEventListener('click', function() { speakSpanish(p.es); });
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 2500);
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+function init() {
+  renderStreakUI();
+  renderPhraseOfDay();
+  checkAdDisplay();
+  currentWords = getDayWords(); // preload so quiz works from home
+}
+
+init();
+</script>
+</body>
+</html>
